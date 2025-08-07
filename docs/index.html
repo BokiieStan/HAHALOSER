@@ -13,28 +13,31 @@
     <div class="loader"></div>
   </div>
   <div class="cursor-follower"></div>
-  <a href="#" class="back-btn" onclick="window.history.back(); return false;"><span class="icon">&#x2B05;&#xFE0F;</span>Back</a>
-  <header>
-    <h1>🧶 Cozy Goblin Crochet</h1>
-    <p>Handmade emotional support yarn creatures & care bundles</p>
-  </header>
+  <div class="nav-wrapper">
+    <nav>
+      <a href="./index.html">Home</a>
+      <a href="./about.html">About</a>
+      <a href="./cart.html">Cart</a>
+    </nav>
+  </div>
+  
+  <div class="container">
+    <a href="#" class="back-btn" onclick="window.history.back(); return false;"><span class="icon">&#x2B05;&#xFE0F;</span>Back</a>
+    <header>
+      <h1>🧶 Cozy Goblin Crochet</h1>
+      <p>Handmade emotional support yarn creatures & care bundles</p>
+    </header>
 
-  <nav>
-    <a href="./index.html">Home</a>
-    <a href="./about.html">About</a>
-    <a href="./cart.html">Cart</a>
-  </nav>
+    <main class="glass">
+      <section class="featured-product fade-in">
+        <h2>✨ Featured Product ✨</h2>
+        <img src="https://placehold.co/400x300/d63384/white?text=Care+Kit" alt="Cozy Goblin Care Kit">
+        <h3>Cozy Goblin Care Kit</h3>
+        <p>Everything you need for a cozy day in. This bundle includes a handmade goblin plushie, a soft blanket, and a warm mug for your favorite drink. Perfect for unwinding!</p>
+        <a href="./products/cozy-goblin-care-kit.html"><button>View Details</button></a>
+      </section>
 
-  <main class="glass">
-    <section class="featured-product fade-in">
-      <h2>✨ Featured Product ✨</h2>
-      <img src="https://placehold.co/400x300/d63384/white?text=Care+Kit" alt="Cozy Goblin Care Kit">
-      <h3>Cozy Goblin Care Kit</h3>
-      <p>Everything you need for a cozy day in. This bundle includes a handmade goblin plushie, a soft blanket, and a warm mug for your favorite drink. Perfect for unwinding!</p>
-      <a href="./products/cozy-goblin-care-kit.html"><button>View Details</button></a>
-    </section>
-
-    <div class="product-grid fade-in">
+      <div class="product-grid fade-in">
         <a href="./products/grumpy-frog.html" class="product-link">
             <section class="product">
                 <img src="https://placehold.co/220x180/d63384/white?text=Grumpy+Frog" alt="Grumpy Frog Keychain">
@@ -137,6 +140,13 @@
     </section>
 
   </main>
+  </div>
+  
+  <div class="footer-wrapper">
+    <footer>
+      <p>&copy; 2024 Cozy Goblin Crochet. Made with 💖 and lots of yarn!</p>
+    </footer>
+  </div>
 
   <script src="./script.js"></script>
 </body>
