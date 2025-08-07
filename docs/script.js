@@ -1,3 +1,33 @@
+// Fake Loading Screen
+window.addEventListener('load', () => {
+    const loader = document.querySelector('.loader-wrapper');
+    setTimeout(() => { // Add a small delay for effect
+        loader.classList.add('hidden');
+    }, 500);
+});
+
+// Cursor Follower
+const cursorFollower = document.querySelector('.cursor-follower');
+if (cursorFollower) {
+    document.addEventListener('mousemove', e => {
+        cursorFollower.style.transform = `translate3d(${e.clientX - 15}px, ${e.clientY - 15}px, 0)`;
+    });
+
+    document.addEventListener('mousedown', () => cursorFollower.style.transform += ' scale(0.8)');
+    document.addEventListener('mouseup', () => cursorFollower.style.transform = cursorFollower.style.transform.replace(' scale(0.8)', ''));
+}
+
+// Wiggle on Click
+document.addEventListener('click', e => {
+    const target = e.target.closest('button, a, .product');
+    if (target) {
+        target.classList.add('wiggle');
+        setTimeout(() => {
+            target.classList.remove('wiggle');
+        }, 300); // Match animation duration in CSS
+    }
+});
+
 // Fade-in animation on scroll
 const fadeInObserver = new IntersectionObserver((entries, observer) => {
     entries.forEach(entry => {
