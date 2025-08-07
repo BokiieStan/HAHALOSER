@@ -1,5 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
 
+/* Animations */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 body {
   font-family: 'Nunito', sans-serif;
   background: linear-gradient(135deg, #ffe4f0 0%, #ffd6ec 100%);
@@ -14,12 +37,12 @@ body {
 
 /* Glassy (jelly) effect */
 .glass, .featured-product, .why-us, .testimonials, .product, .product-detail, main, nav, header, footer {
-  background: rgba(255, 255, 255, 0.60);
-  box-shadow: 0 8px 32px 0 rgba(253, 98, 151, 0.15);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-radius: 22px;
-  border: 1.5px solid rgba(255, 182, 210, 0.35);
+  background: rgba(255, 255, 255, 0.70);
+  box-shadow: 0 8px 40px 0 rgba(253, 98, 151, 0.22);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
 }
 
 main {
@@ -42,6 +65,10 @@ header {
   border-bottom: 2px solid #ffd6ec;
 }
 
+header h1 {
+    animation: fadeInDown 0.8s ease-out both;
+}
+
 header h1, h2 {
   color: #333;
   display: flex;
@@ -50,10 +77,12 @@ header h1, h2 {
 }
 
 h2::before, h2::after {
-    content: ' ♥ ';
+    content: '♥';
     color: #fd6297;
     font-size: 0.8em;
-    margin: 0 10px;
+    margin: 0 15px;
+    display: inline-block;
+    animation: pulse 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 nav {
@@ -155,8 +184,8 @@ main {
 }
 
 .product:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    transform: translateY(-12px) scale(1.03);
+    box-shadow: 0 12px 45px rgba(253, 98, 151, 0.28);
 }
 
 .product img {
@@ -197,8 +226,9 @@ button, .back-btn {
 
 button:hover, .back-btn:hover {
   background: linear-gradient(90deg, #ffb6d2 0%, #fd6297 100%);
-  color: #fff0f8;
-  box-shadow: 0 6px 22px 0 rgba(253, 98, 151, 0.22);
+  color: #fff;
+  box-shadow: 0 8px 28px 0 rgba(253, 98, 151, 0.3);
+  transform: scale(1.05);
 }
 
 .back-btn {
