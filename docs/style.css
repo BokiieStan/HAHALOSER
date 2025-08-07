@@ -2,22 +2,44 @@
 
 body {
   font-family: 'Nunito', sans-serif;
-  background-color: #fdf8f5;
+  background: linear-gradient(135deg, #ffe4f0 0%, #ffd6ec 100%);
+  min-height: 100vh;
   margin: 0;
-  padding: 20px;
+  padding: 40px 0 0 0;
   color: #4a4a4a;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+/* Glassy (jelly) effect */
+.glass, .featured-product, .why-us, .testimonials, .product, .product-detail, main, nav, header, footer {
+  background: rgba(255, 255, 255, 0.60);
+  box-shadow: 0 8px 32px 0 rgba(253, 98, 151, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 22px;
+  border: 1.5px solid rgba(255, 182, 210, 0.35);
+}
+
+main {
+  width: 100%;
+  max-width: 1100px;
+  padding: 40px 32px 32px 32px;
+  margin: 0 auto 40px auto;
+  box-sizing: border-box;
+}
+
 header {
   width: 100%;
-  max-width: 960px;
+  max-width: 1100px;
   text-align: center;
-  padding: 20px 0;
-  border-bottom: 1px solid #e0e0e0;
-  margin-bottom: 30px;
+  padding: 40px 0 20px 0;
+  margin-bottom: 40px;
+  background: rgba(255, 255, 255, 0.60);
+  box-shadow: 0 8px 32px 0 rgba(253, 98, 151, 0.11);
+  border-radius: 22px 22px 0 0;
+  border-bottom: 2px solid #ffd6ec;
 }
 
 header h1, h2 {
@@ -36,20 +58,32 @@ h2::before, h2::after {
 
 nav {
     width: 100%;
-    max-width: 960px;
-    margin: 15px 0 30px 0;
-    padding: 10px 0;
-    border-top: 1px solid #e0e0e0;
-    border-bottom: 1px solid #e0e0e0;
+    max-width: 1100px;
+    margin: 0 0 40px 0;
+    padding: 18px 0;
+    border: none;
     text-align: center;
+    background: rgba(255, 255, 255, 0.50);
+    box-shadow: 0 4px 24px 0 rgba(253, 98, 151, 0.10);
+    border-radius: 0 0 22px 22px;
 }
 
 nav a {
     text-decoration: none;
-    color: #4a4a4a;
-    margin: 0 20px;
-    font-weight: 600;
-    transition: color 0.2s ease;
+    color: #fd6297;
+    margin: 0 32px;
+    font-weight: 700;
+    font-size: 1.18em;
+    transition: color 0.2s, background 0.2s;
+    padding: 10px 20px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.20);
+    box-shadow: 0 2px 8px 0 rgba(253, 98, 151, 0.07);
+}
+
+nav a:hover {
+    color: #fff;
+    background: linear-gradient(90deg, #fd6297 0%, #ffd6ec 100%);
 }
 
 nav a:hover {
@@ -68,9 +102,10 @@ main {
 
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 25px;
-  margin-bottom: 30px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 40px;
+  margin-bottom: 40px;
+  margin-top: 32px;
 }
 
 .product-detail {
@@ -109,13 +144,14 @@ main {
 }
 
 .product {
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  padding: 15px;
+  border: none;
+  border-radius: 22px;
+  padding: 32px 18px 28px 18px;
   text-align: center;
-  background: #ffffff;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: 0 8px 32px 0 rgba(253, 98, 151, 0.13);
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
 }
 
 .product:hover {
@@ -143,17 +179,46 @@ main {
     margin-bottom: 15px;
 }
 
-button {
-  padding: 10px 20px;
-  background: linear-gradient(45deg, #d63384, #fd6297);
+button, .back-btn {
+  padding: 12px 28px;
+  background: linear-gradient(90deg, #fd6297 0%, #ffd6ec 100%);
   border: none;
-  color: white;
+  color: #fff;
   cursor: pointer;
   margin-top: 0.5em;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: background 0.3s ease;
+  border-radius: 22px;
+  font-weight: 700;
+  font-size: 1.08em;
+  box-shadow: 0 4px 16px 0 rgba(253, 98, 151, 0.18);
+  transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+  outline: none;
+  position: relative;
 }
+
+button:hover, .back-btn:hover {
+  background: linear-gradient(90deg, #ffb6d2 0%, #fd6297 100%);
+  color: #fff0f8;
+  box-shadow: 0 6px 22px 0 rgba(253, 98, 151, 0.22);
+}
+
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 22px 0 0 0;
+  background: rgba(255, 182, 210, 0.38);
+  color: #fd6297;
+  font-size: 1.08em;
+  font-weight: 700;
+  border: 2px solid #ffd6ec;
+  box-shadow: 0 2px 8px 0 rgba(253, 98, 151, 0.10);
+}
+
+.back-btn .icon {
+  font-size: 1.2em;
+  margin-right: 2px;
+}
+
 
 button:hover {
     background: linear-gradient(45deg, #c42a75, #e75a8a);
