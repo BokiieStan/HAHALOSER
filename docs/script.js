@@ -1,4 +1,18 @@
+// Fade-in animation on scroll
+const fadeInObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.1 });
+
 document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.fade-in').forEach(element => {
+        fadeInObserver.observe(element);
+    });
+
     updateCartCount();
     if (document.getElementById('cart-items')) {
         renderCart();
