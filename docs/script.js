@@ -23,7 +23,7 @@ function addToCart(name, price) {
 
 function updateCartCount() {
     const cart = getCart();
-    const cartLink = document.querySelector('nav a[href$="cart.html"]');
+    const cartLink = document.querySelector('nav a[href$="./cart.html"]');
     if (cartLink) {
         cartLink.textContent = `Cart (${cart.length})`;
     }
