@@ -357,11 +357,29 @@ button:hover {
     margin-bottom: 10px;
 }
 
-#total {
-    font-weight: bold;
-    font-size: 1.2em;
-    text-align: right;
+#totals-container {
+    padding: 20px 30px;
     margin-top: 20px;
+    margin-bottom: 40px;
+}
+
+#totals-container p {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    font-size: 1.1em;
+}
+
+#totals-container hr {
+    border: 0;
+    border-top: 3px dashed #ffc2d1;
+    margin: 15px 0;
+}
+
+#totals-container .grand-total {
+    font-weight: 900;
+    font-size: 1.5em;
+    color: #d63384;
 }
 
 /* Customer Details Form */

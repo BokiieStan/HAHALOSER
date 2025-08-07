@@ -83,12 +83,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const toAdminTemplateID = 'template_i62fmmo';
             const toCustomerTemplateID = 'template_btkl0ii';
 
+            const subtotal = getCart().reduce((sum, item) => sum + item.price, 0);
+            const shipping = 5.00;
+            const tax = subtotal * 0.08375;
+            const grandTotal = subtotal + shipping + tax;
+
             const templateParams = {
                 'customer-name': document.getElementById('customer-name').value,
                 'customer-address': document.getElementById('customer-address').value,
                 'customer-email': document.getElementById('customer-email').value,
                 'perfume-spray': document.getElementById('perfume-spray').checked ? 'Yes' : 'No',
                 'extra-details': document.getElementById('extra-details').value || 'None',
+                'subtotal': subtotal.toFixed(2),
+                'shipping': shipping.toFixed(2),
+                'tax': tax.toFixed(2),
+                'grand-total': grandTotal.toFixed(2)
             };
 
             // Initialize EmailJS
@@ -142,7 +151,10 @@ function updateCartCount() {
 function renderCart() {
     const cart = getCart();
     const list = document.getElementById("cart-items");
-    const totalEl = document.getElementById("total");
+    const subtotalEl = document.getElementById("subtotal");
+    const shippingEl = document.getElementById("shipping");
+    const taxEl = document.getElementById("tax");
+    const grandTotalEl = document.getElementById("grand-total");
     const paypalItems = document.getElementById("paypal-items");
 
     if (!list) return; // Don't run on pages without a cart section
@@ -152,26 +164,37 @@ function renderCart() {
         paypalItems.innerHTML = '';
     }
 
-    let total = 0;
+    let subtotal = 0;
+    const shippingCost = 5.00;
+    const taxRate = 0.08375;
 
     cart.forEach((item, index) => {
         const li = document.createElement("li");
-        li.textContent = `${item.name} – $${item.price}`;
+        li.textContent = `${item.name} – $${item.price.toFixed(2)}`;
         list.appendChild(li);
 
-        // Add item to PayPal form
         if (paypalItems) {
             const itemNumber = index + 1;
             paypalItems.innerHTML += `
                 <input type="hidden" name="item_name_${itemNumber}" value="${item.name}">
-                <input type="hidden" name="amount_${itemNumber}" value="${item.price}">
+                <input type="hidden" name="amount_${itemNumber}" value="${item.price.toFixed(2)}">
             `;
         }
-
-        total += item.price;
+        subtotal += item.price;
     });
 
-    if (totalEl) {
-        totalEl.textContent = `Total: $${total.toFixed(2)}`;
+    const taxAmount = subtotal * taxRate;
+    const grandTotal = subtotal + shippingCost + taxAmount;
+
+    if (subtotalEl) subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
+    if (shippingEl) shippingEl.textContent = `$${shippingCost.toFixed(2)}`;
+    if (taxEl) taxEl.textContent = `$${taxAmount.toFixed(2)}`;
+    if (grandTotalEl) grandTotalEl.textContent = `$${grandTotal.toFixed(2)}`;
+
+    if (paypalItems) {
+        paypalItems.innerHTML += `
+            <input type="hidden" name="handling_cart" value="${shippingCost.toFixed(2)}">
+            <input type="hidden" name="tax_cart" value="${taxAmount.toFixed(2)}">
+        `;
     }
 }
