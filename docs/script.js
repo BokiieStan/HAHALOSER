@@ -1,48 +1,54 @@
-// Fake Loading Screen
-window.addEventListener('load', () => {
+document.addEventListener('DOMContentLoaded', () => {
+    // --- All scripts that interact with the page go here ---
+
+    // Fake Loading Screen
     const loader = document.querySelector('.loader-wrapper');
-    setTimeout(() => { // Add a small delay for effect
-        loader.classList.add('hidden');
-    }, 500);
-});
-
-// Cursor Follower
-const cursorFollower = document.querySelector('.cursor-follower');
-if (cursorFollower) {
-    document.addEventListener('mousemove', e => {
-        cursorFollower.style.transform = `translate3d(${e.clientX - 15}px, ${e.clientY - 15}px, 0)`;
-    });
-
-    document.addEventListener('mousedown', () => cursorFollower.style.transform += ' scale(0.8)');
-    document.addEventListener('mouseup', () => cursorFollower.style.transform = cursorFollower.style.transform.replace(' scale(0.8)', ''));
-}
-
-// Wiggle on Click
-document.addEventListener('click', e => {
-    const target = e.target.closest('button, a, .product');
-    if (target) {
-        target.classList.add('wiggle');
-        setTimeout(() => {
-            target.classList.remove('wiggle');
-        }, 300); // Match animation duration in CSS
+    if (loader) {
+        // We use window.onload here to ensure all assets are loaded
+        window.onload = () => {
+            setTimeout(() => { // Add a small delay for effect
+                loader.classList.add('hidden');
+            }, 500);
+        };
     }
-});
 
-// Fade-in animation on scroll
-const fadeInObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            observer.unobserve(entry.target);
+    // Cursor Follower
+    const cursorFollower = document.querySelector('.cursor-follower');
+    if (cursorFollower) {
+        document.addEventListener('mousemove', e => {
+            cursorFollower.style.transform = `translate3d(${e.clientX - 15}px, ${e.clientY - 15}px, 0)`;
+        });
+
+        document.addEventListener('mousedown', () => cursorFollower.style.transform += ' scale(0.8)');
+        document.addEventListener('mouseup', () => cursorFollower.style.transform = cursorFollower.style.transform.replace(' scale(0.8)', ''));
+    }
+
+    // Wiggle on Click
+    document.addEventListener('click', e => {
+        const target = e.target.closest('button, a, .product');
+        if (target) {
+            target.classList.add('wiggle');
+            setTimeout(() => {
+                target.classList.remove('wiggle');
+            }, 300); // Match animation duration in CSS
         }
     });
-}, { threshold: 0.1 });
 
-document.addEventListener('DOMContentLoaded', () => {
+    // Fade-in animation on scroll
+    const fadeInObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+
     document.querySelectorAll('.fade-in').forEach(element => {
         fadeInObserver.observe(element);
     });
 
+    // Original Cart and Page Load Logic
     updateCartCount();
     if (document.getElementById('cart-items')) {
         renderCart();
