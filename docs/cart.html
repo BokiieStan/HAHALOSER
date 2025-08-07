@@ -33,13 +33,36 @@
       <h2>Your Cart</h2>
       <ul id="cart-items"></ul>
       <p id="total">Total: $0</p>
-      <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+      <div id="customer-details" class="puffy-border glass">
+        <h2>Your Details</h2>
+        <p>Please fill out your information below. For any questions, contact me at <a href="mailto:clydekevin82@gmail.com">clydekevin82@gmail.com</a>.</p>
+        <form id="customer-details-form">
+          <label for="customer-name">Full Name</label>
+          <input type="text" id="customer-name" name="customer-name" required>
+
+          <label for="customer-address">Shipping Address</label>
+          <textarea id="customer-address" name="customer-address" rows="4" required></textarea>
+
+          <label for="customer-email">Email</label>
+          <input type="email" id="customer-email" name="customer-email" required>
+
+          <div class="checkbox-container">
+            <input type="checkbox" id="perfume-spray" name="perfume-spray">
+            <label for="perfume-spray">Add a light perfume spray to your order? (free of charge)</label>
+          </div>
+
+          <label for="extra-details">Extra Details/Requests</label>
+          <textarea id="extra-details" name="extra-details" rows="4"></textarea>
+        </form>
+      </div>
+
+      <form id="paypal-form" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
         <!-- Replace with your actual PayPal email -->
         <input type="hidden" name="cmd" value="_cart">
         <input type="hidden" name="upload" value="1">
         <input type="hidden" name="business" value="YOURPAYPAL@EMAIL.COM">
         <div id="paypal-items"></div>
-        <button type="submit">Checkout with PayPal</button>
+        <button id="paypal-checkout-btn" type="submit" disabled>Checkout with PayPal</button>
       </form>
     </section>
   </main>
@@ -51,6 +74,7 @@
     </footer>
   </div>
 
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script src="./script.js"></script>
 </body>
 </html>

@@ -53,6 +53,66 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('cart-items')) {
         renderCart();
     }
+
+    // Customer Details Form Validation
+    const customerForm = document.getElementById('customer-details-form');
+    const paypalBtn = document.getElementById('paypal-checkout-btn');
+
+    if (customerForm && paypalBtn) {
+        const requiredFields = Array.from(customerForm.querySelectorAll('input[required], textarea[required]'));
+
+        const validateForm = () => {
+            const allFieldsValid = requiredFields.every(field => field.value.trim() !== '');
+            paypalBtn.disabled = !allFieldsValid;
+        };
+
+        requiredFields.forEach(field => {
+            field.addEventListener('input', validateForm);
+        });
+
+        // EmailJS Integration
+        const paypalForm = document.getElementById('paypal-form');
+        paypalForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Stop the form from submitting immediately
+
+            paypalBtn.textContent = 'Sending confirmation...';
+            paypalBtn.disabled = true;
+
+            const serviceID = 'service_bi10zaa';
+            const publicKey = 'w-4ksu0owjlvtoxv6';
+            const toAdminTemplateID = 'template_i62fmmo';
+            const toCustomerTemplateID = 'template_btkl0ii';
+
+            const templateParams = {
+                'customer-name': document.getElementById('customer-name').value,
+                'customer-address': document.getElementById('customer-address').value,
+                'customer-email': document.getElementById('customer-email').value,
+                'perfume-spray': document.getElementById('perfume-spray').checked ? 'Yes' : 'No',
+                'extra-details': document.getElementById('extra-details').value || 'None',
+            };
+
+            // Initialize EmailJS
+            emailjs.init(publicKey);
+
+            // Send both emails
+            const sendAdminEmail = emailjs.send(serviceID, toAdminTemplateID, templateParams);
+            const sendCustomerEmail = emailjs.send(serviceID, toCustomerTemplateID, templateParams);
+
+            Promise.all([sendAdminEmail, sendCustomerEmail])
+                .then(() => {
+                    paypalBtn.textContent = 'Redirecting to PayPal...';
+                    // Now submit the form to PayPal
+                    paypalForm.submit();
+                }, (error) => {
+                    alert('Oops! Something went wrong with sending the confirmation email. Please try again.\n\nError: ' + JSON.stringify(error));
+                    paypalBtn.textContent = 'Checkout with PayPal';
+                    validateForm(); // Re-enable button if form is valid
+                });
+        });
+
+        // Initial check in case of browser autofill
+        validateForm();
+    }
 });
 
 function getCart() {
@@ -98,19 +158,20 @@ function renderCart() {
         const li = document.createElement("li");
         li.textContent = `${item.name} – $${item.price}`;
         list.appendChild(li);
-        total += item.price;
 
+        // Add item to PayPal form
         if (paypalItems) {
-            // PayPal hidden inputs
+            const itemNumber = index + 1;
             paypalItems.innerHTML += `
-              <input type="hidden" name="item_name_${index + 1}" value="${item.name}">
-              <input type="hidden" name="amount_${index + 1}" value="${item.price}">
-              <input type="hidden" name="quantity_${index + 1}" value="1">
+                <input type="hidden" name="item_name_${itemNumber}" value="${item.name}">
+                <input type="hidden" name="amount_${itemNumber}" value="${item.price}">
             `;
         }
+
+        total += item.price;
     });
 
     if (totalEl) {
-        totalEl.textContent = `Total: $${total}`;
+        totalEl.textContent = `Total: $${total.toFixed(2)}`;
     }
 }
