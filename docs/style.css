@@ -18,9 +18,10 @@ body {
 
 /* Main container for centered content */
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 56px 28px; /* more breathing room */
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    padding: 56px clamp(16px, 4vw, 48px); /* edge-to-edge with responsive side padding */
 }
 
 /* Puffy Borders & General Style */
@@ -83,9 +84,9 @@ body {
 
 main {
   width: 100%;
-  max-width: 1100px;
-  padding: 56px 40px 40px 40px; /* more padding */
-  margin: 0 auto 56px auto;
+  max-width: none;
+  padding: clamp(24px, 4vw, 56px);
+  margin: 0 0 56px 0;
   box-sizing: border-box;
   animation: bounceIn 0.6s cubic-bezier(.2, .8, .2, 1) both;
 }
@@ -103,9 +104,10 @@ main {
 }
 
 .header-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    padding: 0 clamp(16px, 4vw, 48px);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -194,7 +196,7 @@ nav a:hover {
 
 main {
   width: 100%;
-  max-width: 960px;
+  max-width: none;
 }
 
 .product-link {
