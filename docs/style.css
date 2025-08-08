@@ -2,6 +2,10 @@
 
 /* Animations */
 @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.15); opacity: 1; } }
+
+/* When user disables custom cursor */
+body.cursor-disabled { cursor: auto; }
+body.cursor-disabled .cursor-follower { display: none; }
 @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes wiggle { 0%, 100% { transform: rotate(-1deg); } 50% { transform: rotate(1deg); } }
 @keyframes loading-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -190,6 +194,61 @@ nav a:hover {
 
 nav a:hover {
     color: #d63384;
+}
+
+/* Header controls (sound/cursor) */
+.site-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-left: 12px;
+}
+.site-controls button {
+  padding: 8px 12px;
+  border-radius: 14px;
+  border: 2px solid #ffd6ec;
+  background: rgba(255,255,255,0.6);
+  color: #d63384;
+  font-weight: 700;
+}
+.site-controls button.active { background: #ffd6ec; }
+
+/* Hamburger (mobile nav) */
+.hamburger {
+  display: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 2px solid #ffd6ec;
+  background: rgba(255,255,255,0.6);
+  align-items: center;
+  justify-content: center;
+  margin-left: 12px;
+}
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: #d63384;
+  position: relative;
+}
+.hamburger span::before, .hamburger span::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: #d63384;
+}
+.hamburger span::before { top: -6px; }
+.hamburger span::after { top: 6px; }
+
+/* Mobile nav behavior */
+@media (max-width: 768px) {
+  nav { display: none; position: absolute; right: 16px; top: 72px; }
+  .header-wrapper.nav-open nav { display: block; }
+  .hamburger { display: inline-flex; }
+  .header-content { position: relative; }
+  nav a { display: block; margin: 8px 0; }
 }
 
 /* Extra spacing between major sections */

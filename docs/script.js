@@ -16,6 +16,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let audioCtx;
     let bgStarted = false;
 
+    // Settings helpers
+    const getMuted = () => localStorage.getItem('sound_muted') === 'true';
+    const setMuted = (val) => localStorage.setItem('sound_muted', val ? 'true' : 'false');
+    const getCursorDisabled = () => localStorage.getItem('cursor_disabled') === 'true';
+    const setCursorDisabled = (val) => localStorage.setItem('cursor_disabled', val ? 'true' : 'false');
+
     const ensureAudio = () => {
         if (!audioCtx) {
             const AC = window.AudioContext || window.webkitAudioContext;
@@ -26,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const playClick = () => {
+        if (getMuted()) return;
         const ctx = ensureAudio();
         if (!ctx) return;
         const o = ctx.createOscillator();
@@ -44,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const startBg = () => {
+        if (getMuted()) return;
         const ctx = ensureAudio();
         if (!ctx || bgStarted) return;
         bgStarted = true;
@@ -77,11 +85,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const cursorFollower = document.querySelector('.cursor-follower');
     if (cursorFollower) {
         document.addEventListener('mousemove', e => {
+            if (document.body.classList.contains('cursor-disabled')) return;
             cursorFollower.style.transform = `translate3d(${e.clientX - 15}px, ${e.clientY - 15}px, 0)`;
         });
 
         document.addEventListener('mousedown', () => cursorFollower.style.transform += ' scale(0.8)');
         document.addEventListener('mouseup', () => cursorFollower.style.transform = cursorFollower.style.transform.replace(' scale(0.8)', ''));
+    }
+
+    // Apply saved cursor setting on load
+    if (getCursorDisabled()) {
+        document.body.classList.add('cursor-disabled');
     }
 
     // Wiggle on Click
@@ -110,6 +124,76 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.fade-in').forEach(element => {
         fadeInObserver.observe(element);
     });
+
+    // Header controls: mute/unmute and cursor toggle + hamburger menu
+    function initHeaderControls() {
+        const header = document.querySelector('.header-content');
+        const headerWrapper = document.querySelector('.header-wrapper');
+        if (!header) return;
+
+        // Controls container
+        const controls = document.createElement('div');
+        controls.className = 'site-controls';
+
+        // Sound toggle
+        const soundBtn = document.createElement('button');
+        const muted = getMuted();
+        soundBtn.id = 'btn-sound-toggle';
+        soundBtn.textContent = muted ? 'Unmute' : 'Mute';
+        if (muted) soundBtn.classList.add('active');
+        soundBtn.addEventListener('click', async () => {
+            const nowMuted = !getMuted();
+            setMuted(nowMuted);
+            soundBtn.textContent = nowMuted ? 'Unmute' : 'Mute';
+            soundBtn.classList.toggle('active', nowMuted);
+            try {
+                if (audioCtx) {
+                    if (nowMuted && audioCtx.state === 'running') await audioCtx.suspend();
+                    if (!nowMuted && audioCtx.state === 'suspended') await audioCtx.resume();
+                }
+            } catch(_) {}
+        });
+
+        // Cursor toggle
+        const cursorBtn = document.createElement('button');
+        const cursorOff = getCursorDisabled();
+        cursorBtn.id = 'btn-cursor-toggle';
+        cursorBtn.textContent = cursorOff ? 'Enable Cursor' : 'Disable Cursor';
+        if (cursorOff) cursorBtn.classList.add('active');
+        cursorBtn.addEventListener('click', () => {
+            const nowOff = !getCursorDisabled();
+            setCursorDisabled(nowOff);
+            document.body.classList.toggle('cursor-disabled', nowOff);
+            cursorBtn.textContent = nowOff ? 'Enable Cursor' : 'Disable Cursor';
+            cursorBtn.classList.toggle('active', nowOff);
+        });
+
+        // Hamburger button
+        const hamburger = document.createElement('button');
+        hamburger.className = 'hamburger';
+        hamburger.setAttribute('aria-label', 'Toggle navigation');
+        hamburger.innerHTML = '<span></span>';
+        hamburger.addEventListener('click', () => {
+            if (headerWrapper) headerWrapper.classList.toggle('nav-open');
+        });
+
+        // Close nav when clicking a link (mobile)
+        if (headerWrapper) {
+            headerWrapper.addEventListener('click', (e) => {
+                const link = e.target.closest('nav a');
+                if (link) headerWrapper.classList.remove('nav-open');
+            });
+        }
+
+        // Append controls next to nav
+        controls.appendChild(soundBtn);
+        controls.appendChild(cursorBtn);
+        header.appendChild(controls);
+        header.appendChild(hamburger);
+    }
+
+    // Inject header controls and hamburger menu
+    initHeaderControls();
 
     // Product page adjustments: hide header/footer (via CSS class) and inject Back button
     const productMain = document.querySelector('main.product-detail');
