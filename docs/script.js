@@ -135,6 +135,8 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCartCount();
     if (document.getElementById('cart-items')) {
         renderCart();
+        // Initialize gift card UI when on cart page
+        initGiftCardUI();
     }
 
     // Customer Details Form Validation
@@ -238,6 +240,9 @@ function renderCart() {
     const shippingEl = document.getElementById("shipping");
     const taxEl = document.getElementById("tax");
     const grandTotalEl = document.getElementById("grand-total");
+    const giftLine = document.getElementById("giftcard-line");
+    const giftAmtEl = document.getElementById("giftcard-discount");
+    const paypalDiscountInput = document.getElementById("paypal-discount");
     const paypalItems = document.getElementById("paypal-items");
 
     if (!list) return; // Don't run on pages without a cart section
@@ -267,12 +272,34 @@ function renderCart() {
     });
 
     const taxAmount = subtotal * taxRate;
-    const grandTotal = subtotal + shippingCost + taxAmount;
+    const preDiscountTotal = subtotal + shippingCost + taxAmount;
+
+    // Apply gift card if present
+    let discount = 0;
+    const appliedGiftRaw = localStorage.getItem('applied_giftcard');
+    if (appliedGiftRaw) {
+        try {
+            const applied = JSON.parse(appliedGiftRaw);
+            const available = typeof applied.remaining === 'number' ? applied.remaining : (applied.balance || 0);
+            discount = Math.max(0, Math.min(available, preDiscountTotal));
+        } catch (_) { /* ignore parse errors */ }
+    }
+    const grandTotal = Math.max(0, preDiscountTotal - discount);
 
     if (subtotalEl) subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
     if (shippingEl) shippingEl.textContent = `$${shippingCost.toFixed(2)}`;
     if (taxEl) taxEl.textContent = `$${taxAmount.toFixed(2)}`;
     if (grandTotalEl) grandTotalEl.textContent = `$${grandTotal.toFixed(2)}`;
+
+    if (giftLine && giftAmtEl) {
+        if (discount > 0) {
+            giftLine.style.display = '';
+            giftAmtEl.textContent = `-$${discount.toFixed(2)}`;
+        } else {
+            giftLine.style.display = 'none';
+            giftAmtEl.textContent = '-$0.00';
+        }
+    }
 
     if (paypalItems) {
         paypalItems.innerHTML += `
@@ -280,4 +307,85 @@ function renderCart() {
             <input type="hidden" name="tax_cart" value="${taxAmount.toFixed(2)}">
         `;
     }
+
+    if (paypalDiscountInput) {
+        paypalDiscountInput.value = discount.toFixed(2);
+    }
+}
+
+// ---- Gift Card Helpers & UI ----
+async function loadGiftCards() {
+    // Load the gift cards JSON from the site root
+    const res = await fetch('./giftcards.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('Unable to load gift cards');
+    const data = await res.json();
+    return Array.isArray(data) ? data : (data.cards || []);
+}
+
+function initGiftCardUI() {
+    const codeInput = document.getElementById('giftcard-code');
+    const applyBtn = document.getElementById('apply-giftcard-btn');
+    const messageEl = document.getElementById('giftcard-message');
+    if (!codeInput || !applyBtn) return;
+
+    // Show previously applied gift card (if any)
+    const appliedRaw = localStorage.getItem('applied_giftcard');
+    if (appliedRaw) {
+        try {
+            const applied = JSON.parse(appliedRaw);
+            if (applied && applied.code) {
+                codeInput.value = applied.code;
+                if (typeof applied.remaining === 'number') {
+                    messageEl.textContent = `Applied ${applied.code} • Remaining balance: $${applied.remaining.toFixed(2)}`;
+                }
+            }
+        } catch(_) { /* ignore */ }
+    }
+
+    applyBtn.addEventListener('click', async () => {
+        const code = (codeInput.value || '').trim();
+        messageEl.textContent = '';
+        if (!code) {
+            messageEl.textContent = 'Please enter a gift card code.';
+            return;
+        }
+        try {
+            const cards = await loadGiftCards();
+            const card = cards.find(c => (c.code || '').toLowerCase() === code.toLowerCase() && c.active !== false);
+            if (!card) {
+                messageEl.textContent = 'Gift card not found or inactive.';
+                localStorage.removeItem('applied_giftcard');
+                renderCart();
+                return;
+            }
+
+            // Determine available balance, considering any prior local usage
+            const appliedRaw2 = localStorage.getItem('applied_giftcard');
+            let priorRemaining;
+            if (appliedRaw2) {
+                try { priorRemaining = JSON.parse(appliedRaw2).remaining; } catch(_) {}
+            }
+            const available = typeof priorRemaining === 'number' ? priorRemaining : Number(card.balance || 0);
+
+            // Compute current pre-discount total to cap the discount
+            const cart = getCart();
+            const shippingCost = 5.00;
+            const taxRate = 0.08375;
+            const subtotal = cart.reduce((s, it) => s + it.price, 0);
+            const taxAmount = subtotal * taxRate;
+            const preDiscountTotal = subtotal + shippingCost + taxAmount;
+            const discount = Math.max(0, Math.min(available, preDiscountTotal));
+            const remaining = Math.max(0, available - discount);
+
+            // Persist applied card and remaining locally (client-side only)
+            localStorage.setItem('applied_giftcard', JSON.stringify({ code: card.code, remaining, balance: Number(card.balance || 0) }));
+
+            // Update UI
+            messageEl.textContent = `Applied ${card.code} • Using $${discount.toFixed(2)} now. Remaining balance: $${remaining.toFixed(2)}`;
+            renderCart();
+        } catch (err) {
+            messageEl.textContent = 'There was a problem checking the gift card. Please try again.';
+            console.error(err);
+        }
+    });
 }

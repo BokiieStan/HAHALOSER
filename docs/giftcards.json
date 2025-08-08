@@ -1,0 +1,15 @@
+{
+  "cards": [
+    {
+      "code": "TEST-100",
+      "balance": 100.00,
+      "active": true,
+      "note": "Example gift card for testing"
+    },
+    {
+      "code": "WELCOME-25",
+      "balance": 25.00,
+      "active": true
+    }
+  ]
+}

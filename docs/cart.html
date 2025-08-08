@@ -37,9 +37,20 @@
         <p>Subtotal: <span id="subtotal">$0.00</span></p>
         <p>Shipping: <span id="shipping">$5.00</span></p>
         <p>Tax (8.375%): <span id="tax">$0.00</span></p>
+        <p id="giftcard-line" style="display:none; color:#d63384; font-weight:700;">Gift Card: <span id="giftcard-discount">-$0.00</span></p>
         <hr>
         <p class="grand-total">Grand Total: <span id="grand-total">$0.00</span></p>
       </div>
+      <div id="giftcard-section" class="puffy-border glass">
+        <h2>Gift Card</h2>
+        <p>Have a gift card? Enter it below and click Apply.</p>
+        <div class="giftcard-row">
+          <input type="text" id="giftcard-code" placeholder="Enter gift card code" style="padding:10px; border-radius:12px; border:2px solid #ffd6ec; width: 260px;">
+          <button id="apply-giftcard-btn" type="button" style="margin-left:12px;">Apply</button>
+        </div>
+        <p id="giftcard-message" style="margin-top:10px; color:#d63384; font-weight:700;"></p>
+      </div>
+
       <div id="customer-details" class="puffy-border glass">
         <h2>Your Details</h2>
         <p>Please fill out your information below. For any questions, contact me at <a href="mailto:clydekevin82@gmail.com">clydekevin82@gmail.com</a>.</p>
@@ -68,6 +79,7 @@
         <input type="hidden" name="cmd" value="_cart">
         <input type="hidden" name="upload" value="1">
         <input type="hidden" name="business" value="YOURPAYPAL@EMAIL.COM">
+        <input type="hidden" id="paypal-discount" name="discount_amount_cart" value="0.00">
         <div id="paypal-items"></div>
         <button id="paypal-checkout-btn" type="submit" disabled>Checkout with PayPal</button>
       </form>
