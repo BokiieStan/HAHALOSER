@@ -82,6 +82,11 @@ body {
   border: 2px solid rgba(255, 255, 255, 0.4);
 }
 
+/* Inner padding so text doesn't touch edges */
+.glass, .featured-product, .why-us, .testimonials, .product, .product-detail {
+  padding: clamp(16px, 3vw, 32px);
+}
+
 main {
   width: 100%;
   max-width: none;
@@ -192,6 +197,20 @@ nav a:hover {
 
 nav a:hover {
     color: #d63384;
+}
+
+/* Extra spacing between major sections */
+.why-us { 
+  margin-top: clamp(32px, 6vw, 72px); 
+  margin-bottom: clamp(32px, 6vw, 72px);
+}
+.testimonials { 
+  margin-top: clamp(32px, 6vw, 72px); 
+}
+
+/* Padding inside testimonial cards if present */
+.testimonial { 
+  padding: clamp(12px, 2.5vw, 24px); 
 }
 
 main {
