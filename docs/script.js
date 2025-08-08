@@ -12,6 +12,67 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
+    // --- Global Audio (click sound + background music) ---
+    let audioCtx;
+    let bgStarted = false;
+
+    const ensureAudio = () => {
+        if (!audioCtx) {
+            const AC = window.AudioContext || window.webkitAudioContext;
+            if (!AC) return null;
+            audioCtx = new AC();
+        }
+        return audioCtx;
+    };
+
+    const playClick = () => {
+        const ctx = ensureAudio();
+        if (!ctx) return;
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'sine';
+        o.frequency.value = 600; // pleasant soft click
+        g.gain.value = 0.0001;
+        o.connect(g);
+        g.connect(ctx.destination);
+        const now = ctx.currentTime;
+        g.gain.setValueAtTime(0.0001, now);
+        g.gain.exponentialRampToValueAtTime(0.2, now + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+        o.start(now);
+        o.stop(now + 0.1);
+    };
+
+    const startBg = () => {
+        const ctx = ensureAudio();
+        if (!ctx || bgStarted) return;
+        bgStarted = true;
+        // Gentle, low-volume two-note pad
+        const g = ctx.createGain();
+        g.gain.value = 0.03; // very soft
+        g.connect(ctx.destination);
+
+        const o1 = ctx.createOscillator();
+        o1.type = 'sine';
+        o1.frequency.value = 220; // A3
+        o1.connect(g);
+        const o2 = ctx.createOscillator();
+        o2.type = 'sine';
+        o2.frequency.value = 277.18; // C#4 - simple dyad
+        o2.connect(g);
+        o1.start();
+        o2.start();
+    };
+
+    // Start background music on first user interaction to satisfy autoplay policies
+    const startOnFirstInteraction = () => {
+        startBg();
+        document.removeEventListener('click', startOnFirstInteraction);
+        document.removeEventListener('keydown', startOnFirstInteraction);
+    };
+    document.addEventListener('click', startOnFirstInteraction);
+    document.addEventListener('keydown', startOnFirstInteraction);
+
     // Cursor Follower
     const cursorFollower = document.querySelector('.cursor-follower');
     if (cursorFollower) {
@@ -25,6 +86,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Wiggle on Click
     document.addEventListener('click', e => {
+        // play global click sound
+        playClick();
         const target = e.target.closest('button, a, .product');
         if (target) {
             target.classList.add('wiggle');
@@ -47,6 +110,26 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.fade-in').forEach(element => {
         fadeInObserver.observe(element);
     });
+
+    // Product page adjustments: hide header/footer (via CSS class) and inject Back button
+    const productMain = document.querySelector('main.product-detail');
+    if (productMain) {
+        document.body.classList.add('product-page');
+        const container = document.querySelector('.container') || document.body;
+        const backBtn = document.createElement('button');
+        backBtn.className = 'back-btn';
+        backBtn.innerHTML = '<span class="icon">←</span> Back';
+        backBtn.addEventListener('click', (ev) => {
+            ev.preventDefault();
+            if (window.history.length > 1) {
+                history.back();
+            } else {
+                // Fallback to home if no history
+                window.location.href = '../index.html';
+            }
+        });
+        container.insertBefore(backBtn, productMain);
+    }
 
     // Original Cart and Page Load Logic
     updateCartCount();

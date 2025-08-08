@@ -157,7 +157,12 @@ h2::before, h2::after {
     animation: pulse 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+/* Hide header and footer on product pages */
+body.product-page .header-wrapper,
+body.product-page .footer-wrapper { display: none; }
 
+/* Slightly reduce top margin when header is hidden */
+body.product-page .container { padding-top: 20px; }
 
 nav {
     text-align: right;
