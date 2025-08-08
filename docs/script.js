@@ -171,7 +171,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const subtotal = getCart().reduce((sum, item) => sum + item.price, 0);
             const shipping = 5.00;
             const tax = subtotal * 0.08375;
-            const grandTotal = subtotal + shipping + tax;
+            const preDiscountTotal = subtotal + shipping + tax;
+
+            // Include gift card info in order email
+            let giftCode = '';
+            let giftDiscount = 0;
+            let giftRemaining = 0;
+            try {
+                const appliedGiftRaw = localStorage.getItem('applied_giftcard');
+                if (appliedGiftRaw) {
+                    const applied = JSON.parse(appliedGiftRaw);
+                    const available = typeof applied.remaining === 'number' ? applied.remaining : (applied.balance || 0);
+                    giftDiscount = Math.max(0, Math.min(available, preDiscountTotal));
+                    giftRemaining = Math.max(0, available - giftDiscount);
+                    giftCode = applied.code || '';
+                }
+            } catch(_) { /* ignore */ }
+
+            const grandTotal = Math.max(0, preDiscountTotal - giftDiscount);
 
             const templateParams = {
                 'customer-name': document.getElementById('customer-name').value,
@@ -182,7 +199,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 'subtotal': subtotal.toFixed(2),
                 'shipping': shipping.toFixed(2),
                 'tax': tax.toFixed(2),
-                'grand-total': grandTotal.toFixed(2)
+                'grand-total': grandTotal.toFixed(2),
+                // Gift card extras (optional in template)
+                'giftcard-code': giftCode,
+                'giftcard-discount': giftDiscount.toFixed(2),
+                'giftcard-remaining': giftRemaining.toFixed(2),
+                'prediscount-total': preDiscountTotal.toFixed(2)
             };
 
             // Initialize EmailJS
@@ -194,6 +216,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             Promise.all([sendAdminEmail, sendCustomerEmail])
                 .then(() => {
+                    // After emailing, update local remaining balance so it reflects this order's usage
+                    try {
+                        const appliedGiftRaw2 = localStorage.getItem('applied_giftcard');
+                        if (appliedGiftRaw2) {
+                            const applied2 = JSON.parse(appliedGiftRaw2);
+                            const balance = Number(applied2.balance || 0);
+                            const newRemaining = giftRemaining;
+                            localStorage.setItem('applied_giftcard', JSON.stringify({ code: applied2.code, remaining: newRemaining, balance }));
+                        }
+                    } catch(_) { /* ignore */ }
                     paypalBtn.textContent = 'Redirecting to PayPal...';
                     // Now submit the form to PayPal
                     paypalForm.submit();
@@ -383,9 +415,62 @@ function initGiftCardUI() {
             // Update UI
             messageEl.textContent = `Applied ${card.code} • Using $${discount.toFixed(2)} now. Remaining balance: $${remaining.toFixed(2)}`;
             renderCart();
+
+            // Notify store owner via EmailJS (non-blocking)
+            try {
+                notifyGiftCardUse({
+                    code: card.code,
+                    discountApplied: discount,
+                    remaining,
+                    subtotal,
+                    shipping: shippingCost,
+                    tax: taxAmount,
+                    preDiscountTotal,
+                });
+            } catch (e) {
+                console.warn('Gift card notification failed:', e);
+            }
         } catch (err) {
             messageEl.textContent = 'There was a problem checking the gift card. Please try again.';
             console.error(err);
         }
     });
+}
+
+// Send an EmailJS notification to the shop owner when a gift card is applied
+function notifyGiftCardUse(payload) {
+    // These should match your existing EmailJS service/key. Update template ID in your EmailJS account.
+    const serviceID = 'service_bi10zaa';
+    const publicKey = 'w-4ksu0owjlvtoxv6';
+    const templateID = 'template_giftcard_notify'; // TODO: create this template in EmailJS
+
+    // Collect optional customer info if present on page
+    const customerEmailEl = document.getElementById('customer-email');
+    const customerNameEl = document.getElementById('customer-name');
+    const codeInput = document.getElementById('giftcard-code');
+
+    const cart = getCart();
+    const cartItemsStr = cart.map(i => `${i.name} ($${i.price.toFixed(2)})`).join(', ');
+
+    const templateParams = {
+        giftcard_code: payload.code,
+        discount_applied: payload.discountApplied.toFixed(2),
+        remaining_balance: payload.remaining.toFixed(2),
+        subtotal: (payload.subtotal || 0).toFixed(2),
+        shipping: (payload.shipping || 0).toFixed(2),
+        tax: (payload.tax || 0).toFixed(2),
+        prediscount_total: (payload.preDiscountTotal || 0).toFixed(2),
+        cart_items: cartItemsStr || 'None',
+        customer_email: customerEmailEl ? (customerEmailEl.value || '') : '',
+        customer_name: customerNameEl ? (customerNameEl.value || '') : '',
+        entered_code: codeInput ? (codeInput.value || '') : '',
+        used_at: new Date().toLocaleString(),
+    };
+
+    if (typeof emailjs !== 'undefined') {
+        try { emailjs.init(publicKey); } catch (_) {}
+        emailjs.send(serviceID, templateID, templateParams).catch(err => {
+            console.warn('EmailJS send failed (gift card notify):', err);
+        });
+    }
 }
